@@ -1,8 +1,10 @@
 import nltk
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
+from collections import Counter
+import xml.etree.ElementTree as ET
 
 class Reprompt:
     def __init__(self):
@@ -13,48 +15,69 @@ class Reprompt:
         self.lemmatizer = WordNetLemmatizer()
 
     def preprocess(self, text):
-        # Lowercase and remove punctuation
-        text = re.sub(r'[^\w\s]', '', text.lower())
+        # Capitalize and fix basic grammar
+        text = '. '.join(sent.capitalize() for sent in sent_tokenize(text))
         
         # Tokenize
         tokens = word_tokenize(text)
         
         # Remove stop words and lemmatize
-        tokens = [self.lemmatizer.lemmatize(token) for token in tokens if token not in self.stop_words]
+        tokens = [self.lemmatizer.lemmatize(token.lower()) for token in tokens if token.lower() not in self.stop_words]
         
         return tokens
 
     def identify_key_concepts(self, tokens):
-        # This is where we implement logic to identify important concepts
-        # For now, we'll just return the most frequent words
-        from collections import Counter
         return [word for word, count in Counter(tokens).most_common(5)]
 
     def determine_intent(self, tokens):
-        # Implement logic to determine the user's intent
-        # This involve looking for specific keywords or patterns
-        intent = "unknown"
-        if "how" in tokens:
-            intent = "instruction"
-        elif "what" in tokens:
-            intent = "definition"
-        elif "why" in tokens:
-            intent = "explanation"
-        return intent
+        intent_keywords = {
+            "instruction": ["how", "steps", "guide"],
+            "definition": ["what", "define", "explain"],
+            "explanation": ["why", "reason", "cause"],
+            "comparison": ["compare", "contrast", "versus"],
+            "analysis": ["analyze", "examine", "investigate"],
+            "summary": ["summarize", "brief", "overview"]
+        }
+        
+        for intent, keywords in intent_keywords.items():
+            if any(keyword in tokens for keyword in keywords):
+                return intent
+        return "general"
 
     def generate_improved_prompt(self, original_prompt):
         tokens = self.preprocess(original_prompt)
         key_concepts = self.identify_key_concepts(tokens)
         intent = self.determine_intent(tokens)
         
-        # Construct improved prompt based on intent and key concepts
+        # Construct XML structure
+        root = ET.Element("prompt")
+        
+        # Add context
+        context = ET.SubElement(root, "context")
+        context.text = f"The user is seeking information about {', '.join(key_concepts)}."
+        
+        # Add instruction
+        instruction = ET.SubElement(root, "instruction")
         if intent == "instruction":
-            improved_prompt = f"Provide step-by-step instructions on how to {' '.join(key_concepts)}"
+            instruction.text = f"Provide step-by-step instructions on how to {' '.join(key_concepts)}. Limit the response to 5 steps."
         elif intent == "definition":
-            improved_prompt = f"Define and explain the concept of {' '.join(key_concepts)}"
+            instruction.text = f"Define and explain the concept of {' '.join(key_concepts)} in 2-3 sentences."
         elif intent == "explanation":
-            improved_prompt = f"Explain in detail why {' '.join(key_concepts)} occurs or is important"
+            instruction.text = f"Explain in detail why {' '.join(key_concepts)} occurs or is important. Use a 'lightweight chain of thought' approach by first stating your reasoning process, then providing the explanation."
+        elif intent == "comparison":
+            instruction.text = f"Compare and contrast {' and '.join(key_concepts[:2])} in a brief paragraph."
+        elif intent == "analysis":
+            instruction.text = f"Analyze {' '.join(key_concepts)} by considering its causes, effects, and implications. Structure your response with clear subheadings."
+        elif intent == "summary":
+            instruction.text = f"Provide a concise summary of {' '.join(key_concepts)} in 3-4 bullet points."
         else:
-            improved_prompt = f"Provide comprehensive information about {' '.join(key_concepts)}"
+            instruction.text = f"Provide comprehensive information about {' '.join(key_concepts)}. Structure your response with an introduction, main points, and a conclusion."
+        
+        # Add output format
+        output_format = ET.SubElement(root, "output_format")
+        output_format.text = "Please structure your response using appropriate headings and subheadings. Use bullet points where applicable for clarity."
+        
+        # Convert to string
+        improved_prompt = ET.tostring(root, encoding="unicode")
         
         return improved_prompt
