@@ -1,0 +1,10 @@
+setup.bat
+
+/virenv
+./virenv
+./virenv/*
+
+_pycache_/**/*
+
+.vscode/*
+./.vscode
