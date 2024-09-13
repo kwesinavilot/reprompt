@@ -44,7 +44,7 @@ class Reprompt:
                 return intent
         return "general"
 
-    def generate_improved_prompt(self, original_prompt):
+    def improve(self, original_prompt):
         tokens = self.preprocess(original_prompt)
         key_concepts = self.identify_key_concepts(tokens)
         intent = self.determine_intent(tokens)
