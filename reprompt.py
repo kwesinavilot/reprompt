@@ -9,6 +9,7 @@ import xml.etree.ElementTree as ET
 class Reprompt:
     def __init__(self):
         nltk.download('punkt')
+        nltk.download('punkt_tab')
         nltk.download('stopwords')
         nltk.download('wordnet')
         self.stop_words = set(stopwords.words('english'))
@@ -41,6 +42,7 @@ class Reprompt:
         
         for intent, keywords in intent_keywords.items():
             if any(keyword in tokens for keyword in keywords):
+                print(intent)
                 return intent
         return "general"
 
@@ -75,7 +77,7 @@ class Reprompt:
         
         # Add output format
         output_format = ET.SubElement(root, "output_format")
-        output_format.text = "Please structure your response using appropriate headings and subheadings. Use bullet points where applicable for clarity."
+        output_format.text = "Structure your response using appropriate headings and subheadings. Use bullet points where applicable for clarity."
         
         # Convert to string
         improved_prompt = ET.tostring(root, encoding="unicode")

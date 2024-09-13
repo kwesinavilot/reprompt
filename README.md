@@ -7,7 +7,7 @@ The idea for Reprompt came after watching [a talk Zack Witten from Anthropic gav
 
 This got me thinking: what if there was a tool that could take any prompt, understand the bigger picture of what the user is trying to achieve, and then refine it into a clearer, more concise version without extra work for the user?
 
-I realized I'd have to use an LLM, most likely a small open source model. But I also realized that that'll be an extra call to an LLM, which may result in latency issues and even extra cost. Already, people are ok using whatever prompts they have. There's no need making an extra call to an LLM to refine the prompt.
+I realized I'd have to use an LLM, most likely a small open source model. But I also realized that that'll be an extra call to an LLM, which may result in latency issues and even extra cost. Already, people are ok using whatever prompts they have so there's no need making an extra call to an LLM to refine the prompt which will later be giving to an LLM.
 
 I thought it would be fun to create a tool that could help users get exactly what they need from their prompts, just by analyzing and restructuring them using native NLP techniques, without relying on large language models.
 
@@ -21,15 +21,23 @@ As can be seen, some of the best practices discussed in the talk are incorporate
 - Incorporates best practices from the prompt engineering workshop given at the [2024 AI Engineer Conference by Zack Witten (Anthropic)](https://www.youtube.com/watch?v=hkhDdcM5V94)
 - Operates without requiring integration with an LLM
 
-## Installation
 
-To install Reprompt, you need Python 3.6 or later. You can install it using pip:
+
+# Installation
+To install Reprompt, you need Python 3.6 or later
+
+Currently, you can download the `reprompt.py` file and place it in a location that is accessible by your Python script. You can then import the Reprompt class as usual.
+
+For example, if you place the reprompt.py file in the same directory as your script, you can import it like this:
 
 ```
-pip install reprompt
+from reprompt import Reprompt
 ```
 
-NOTE: This is a placeholder. The library is not actually available on PyPI yet.
+Make sure to adjust the import statement according to the location of the reprompt.py file in your project.
+
+I will update this documentation once the library is available on PyPI.
+
 
 ## Dependencies
 
