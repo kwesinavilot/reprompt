@@ -4,7 +4,7 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
 
-class PromptEngineer:
+class Reprompt:
     def __init__(self):
         nltk.download('punkt')
         nltk.download('stopwords')
@@ -25,14 +25,14 @@ class PromptEngineer:
         return tokens
 
     def identify_key_concepts(self, tokens):
-        # This is where you'd implement logic to identify important concepts
+        # This is where we implement logic to identify important concepts
         # For now, we'll just return the most frequent words
         from collections import Counter
         return [word for word, count in Counter(tokens).most_common(5)]
 
     def determine_intent(self, tokens):
         # Implement logic to determine the user's intent
-        # This could involve looking for specific keywords or patterns
+        # This involve looking for specific keywords or patterns
         intent = "unknown"
         if "how" in tokens:
             intent = "instruction"
